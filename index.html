@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MindPulse — AI Mental Health Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Background ambience -->
+<div class="bg-field" aria-hidden="true">
+  <div class="glow glow-a"></div>
+  <div class="glow glow-b"></div>
+  <svg class="grid-lines" aria-hidden="true"><rect width="100%" height="100%" fill="url(#grid)"/><defs><pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M 48 0 L 0 0 0 48" fill="none" stroke="rgba(148,178,196,0.06)" stroke-width="1"/></pattern></defs></svg>
+</div>
+
+<!-- Toast container -->
+<div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+<header class="top-bar">
+  <div class="top-bar-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M4 17h4l2.5-8L15 24l3-13 2 6h4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="brand-name">MindPulse</span>
+    </div>
+    <nav class="top-nav">
+      <a href="#assessment">Assessment</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#about">About</a>
+    </nav>
+    <span class="status-pill" id="apiStatusPill">
+      <span class="dot" id="apiStatusDot"></span>
+      <span id="apiStatusText">Checking model server…</span>
+    </span>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow-free-label">Digital wellbeing, quantified</p>
+      <h1>Your screen time tells<br/>a story. <span class="hero-underline">Let's read it.</span></h1>
+      <p class="hero-sub">MindPulse combines your social media habits, sleep, study load and activity levels into a single machine-learning model that estimates your current mental wellness score — instantly, and entirely on your own data.</p>
+      <div class="hero-actions">
+        <a href="#assessment" class="btn btn-primary">
+          <span>Start my assessment</span>
+          <svg viewBox="0 0 20 20" fill="none" class="btn-arrow"><path d="M4 10h12M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#how-it-works" class="btn btn-ghost">How the model works</a>
+      </div>
+      <dl class="hero-stats">
+        <div><dt>12</dt><dd>input signals</dd></div>
+        <div><dt>&lt;1s</dt><dd>prediction time</dd></div>
+        <div><dt>0</dt><dd>data stored</dd></div>
+      </dl>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <div class="pulse-card">
+        <svg class="pulse-svg" viewBox="0 0 360 360">
+          <circle cx="180" cy="180" r="150" class="orbit-ring ring-1"/>
+          <circle cx="180" cy="180" r="112" class="orbit-ring ring-2"/>
+          <g class="node-group">
+            <circle cx="180" cy="30" r="5" class="node"/>
+            <circle cx="330" cy="180" r="5" class="node"/>
+            <circle cx="180" cy="330" r="5" class="node"/>
+            <circle cx="30" cy="180" r="5" class="node"/>
+            <circle cx="285" cy="75" r="4" class="node node-sm"/>
+            <circle cx="285" cy="285" r="4" class="node node-sm"/>
+            <circle cx="75" cy="285" r="4" class="node node-sm"/>
+            <circle cx="75" cy="75" r="4" class="node node-sm"/>
+          </g>
+          <path class="pulse-line" d="M40 180 L120 180 L140 130 L165 230 L185 90 L205 260 L225 180 L320 180" fill="none"/>
+        </svg>
+        <div class="pulse-center">
+          <span class="pulse-center-num">78</span>
+          <span class="pulse-center-label">sample score</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how-it-works">
+    <div class="how-step">
+      <span class="how-index">Step 1</span>
+      <h3>Share your habits</h3>
+      <p>Tell us about your platform use, study routine, sleep and activity — takes under a minute.</p>
+    </div>
+    <div class="how-step">
+      <span class="how-index">Step 2</span>
+      <h3>Model runs locally</h3>
+      <p>Your inputs are sent directly to a FastAPI model running on your machine — nothing leaves your network.</p>
+    </div>
+    <div class="how-step">
+      <span class="how-index">Step 3</span>
+      <h3>Get a wellness score</h3>
+      <p>Receive a 0–100 score with a plain-language category and tailored recommendations.</p>
+    </div>
+  </section>
+
+  <!-- ASSESSMENT FORM -->
+  <section class="assessment" id="assessment">
+    <div class="assessment-head">
+      <h2>Tell us about your day-to-day</h2>
+      <p>Every field feeds the model. Fill it in as accurately as you can for the most reliable score.</p>
+    </div>
+
+    <form class="glass-panel" id="predictForm" novalidate>
+
+      <fieldset class="form-group">
+        <legend>Personal details</legend>
+        <div class="field-grid">
+          <div class="field">
+            <label for="age">Age</label>
+            <input type="number" id="age" name="Age" min="10" max="100" step="1" placeholder="e.g. 21" required />
+            <span class="field-error" data-error-for="age"></span>
+          </div>
+          <div class="field">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+              <option value="" disabled selected>Select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+            <span class="field-error" data-error-for="gender"></span>
+          </div>
+          <div class="field">
+            <label for="country">Country</label>
+            <select id="country" name="Country" required>
+              <option value="" disabled selected>Select country</option>
+              <option>India</option>
+              <option>USA</option>
+              <option>Canada</option>
+              <option>Australia</option>
+              <option>UK</option>
+              <option>Germany</option>
+              <option>Mexico</option>
+              <option>Turkey</option>
+              <option>France</option>
+              <option>Other</option>
+            </select>
+            <span class="field-error" data-error-for="country"></span>
+          </div>
+          <div class="field">
+            <label for="academicLevel">Academic level</label>
+            <select id="academicLevel" name="Academic_Level" required>
+              <option value="" disabled selected>Select level</option>
+              <option>High School</option>
+              <option>Undergraduate</option>
+              <option>Graduate</option>
+            </select>
+            <span class="field-error" data-error-for="academicLevel"></span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-group">
+        <legend>Digital habits</legend>
+        <div class="field-grid">
+          <div class="field">
+            <label for="platform">Most used platform</label>
+            <select id="platform" name="Most_Used_Platform" required>
+              <option value="" disabled selected>Select platform</option>
+              <option>Instagram</option>
+              <option>Facebook</option>
+              <option>Twitter</option>
+              <option>Snapchat</option>
+              <option>TikTok</option>
+              <option>LinkedIn</option>
+              <option>Whatsapp</option>
+              <option>Youtube</option>
+              <option>Reddit</option>
+              <option>VKontakte</option>
+            </select>
+            <span class="field-error" data-error-for="platform"></span>
+          </div>
+          <div class="field">
+            <label for="purpose">Primary purpose of use</label>
+            <select id="purpose" name="Purpose_Of_Use" required>
+              <option value="" disabled selected>Select purpose</option>
+              <option>Networking</option>
+              <option>Entertainment</option>
+              <option>Education</option>
+              <option>News</option>
+            </select>
+            <span class="field-error" data-error-for="purpose"></span>
+          </div>
+          <div class="field">
+            <label for="usageHours">Avg. daily usage (hours)</label>
+            <input type="number" id="usageHours" name="Avg_Daily_Usage_Hours" min="0" max="24" step="0.1" placeholder="e.g. 5.5" required />
+            <span class="field-error" data-error-for="usageHours"></span>
+          </div>
+          <div class="field">
+            <label for="unlocks">Daily phone unlocks</label>
+            <input type="number" id="unlocks" name="Daily_Unlocks" min="0" max="500" step="1" placeholder="e.g. 80" required />
+            <span class="field-error" data-error-for="unlocks"></span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-group">
+        <legend>Lifestyle &amp; wellbeing</legend>
+        <div class="field-grid">
+          <div class="field">
+            <label for="studyHours">Study hours per day</label>
+            <input type="number" id="studyHours" name="Study_Hours" min="0" max="24" step="0.1" placeholder="e.g. 6" required />
+            <span class="field-error" data-error-for="studyHours"></span>
+          </div>
+          <div class="field">
+            <label for="activityHours">Physical activity (hours/day)</label>
+            <input type="number" id="activityHours" name="Physical_Activity_Hours" min="0" max="24" step="0.1" placeholder="e.g. 1.5" required />
+            <span class="field-error" data-error-for="activityHours"></span>
+          </div>
+          <div class="field">
+            <label for="sleepHours">Sleep per night (hours)</label>
+            <input type="number" id="sleepHours" name="Sleep_Hours_Per_Night" min="0" max="24" step="0.1" placeholder="e.g. 7" required />
+            <span class="field-error" data-error-for="sleepHours"></span>
+          </div>
+          <div class="field">
+            <label for="stressLevel">Stress level</label>
+            <select id="stressLevel" name="Stress_Level" required>
+              <option value="" disabled selected>Select stress level</option>
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+              <option>Very High</option>
+            </select>
+            <span class="field-error" data-error-for="stressLevel"></span>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="form-footer">
+        <p class="privacy-note">Your data is sent only to your local model server and isn't stored anywhere.</p>
+        <button type="submit" class="btn btn-primary btn-submit" id="submitBtn">
+          <span class="btn-label">Generate my score</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- RESULT -->
+  <section class="result-section" id="resultSection" hidden>
+    <div class="glass-panel result-panel">
+      <div class="result-ring-wrap">
+        <svg class="result-ring" viewBox="0 0 220 220">
+          <circle cx="110" cy="110" r="96" class="ring-track"/>
+          <circle cx="110" cy="110" r="96" class="ring-progress" id="ringProgress"/>
+        </svg>
+        <div class="result-ring-center">
+          <span class="result-score" id="resultScore">0</span>
+          <span class="result-score-suffix">/ 100</span>
+        </div>
+      </div>
+
+      <div class="result-details">
+        <span class="result-category" id="resultCategory">—</span>
+        <h3 id="resultHeadline">Your wellness score</h3>
+        <p id="resultSummary">Fill out the assessment above to see your personalized mental wellness score.</p>
+
+        <div class="recommendations" id="recommendations" aria-live="polite">
+          <!-- injected via JS -->
+        </div>
+
+        <button type="button" class="btn btn-ghost" id="retakeBtn">Run another assessment</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p>MindPulse is an educational ML demo and is not a substitute for professional medical or psychological advice.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
